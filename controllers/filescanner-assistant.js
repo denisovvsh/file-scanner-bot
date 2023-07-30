@@ -139,29 +139,43 @@ class FilescannerAssistant extends attributesAssistant {
     if (!result) return
     for (let data of result.response) {
       if (directoryPath && directoryPath !== data.path) continue
-      await this.delay(1000)
+      await this.delay(500)
       this.startMonitoringDir(data.path, data)
     }
   }
 
   async startMonitoringDir(directoryPath, data = null) {
-    watcher[directoryPath] = chokidar.watch(directoryPath, {
+    let key = this._md5(directoryPath)
+    watcher[key] = chokidar.watch(directoryPath, {
       ignored: /(^|[\/\\])\../, // Игнорировать скрытые файлы
       persistent: true // Оставаться в слежении даже после завершения сценария
     })
     .on('add', async (path) => {
-      let text = `🟢 <b>Новый файл добавлен:</b> \n\n<pre>${path}</pre>`
+      let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
+      await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+    })
+    .on('change', async (path) => {
+      let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
       await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
     })
     .on('unlink', async (path) => {
-      let text = `🔴 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
+      let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
+      await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+    })
+    .on('addDir', async (path) => {
+      let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
+      await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+    })
+    .on('unlinkDir', async (path) => {
+      let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
       await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
     })
   }
 
   async stopMonitoring(path) {
-    if (watcher[path]) {
-      await watcher[path].close()
+    let key = this._md5(path)
+    if (watcher[key]) {
+      await watcher[key].close()
     }
   }
 
