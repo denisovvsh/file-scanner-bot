@@ -52,6 +52,12 @@ addDirectoryToMonitoringList.on('text', async (ctx) => {
     let path = ctx.message.text.trim()
     let filescanner = new FilescannerAssistant(bot, md5)
     await filescanner.accessDri(path, data)
+      .then(() => {
+        ctx.reply(`🟠 <i>Запускаем мониторинг директории!</i>`, {
+          "reply_to_message_id": ctx.update.message.message_id,
+          "parse_mode": "HTML"
+        })
+      })
     return ctx.scene.leave()
   }
 })

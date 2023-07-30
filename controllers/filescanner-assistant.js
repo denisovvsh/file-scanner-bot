@@ -62,9 +62,6 @@ class FilescannerAssistant extends attributesAssistant {
   }
 
   async insertPathDirAndStartMonitoring(directoryPath, data) {
-    let text = `🟠 <i>Запускаем мониторинг директории:</i> <pre>${directoryPath}</pre>`
-    await this._bot.telegram.sendMessage(data.user_id, text, {"parse_mode": "HTML"})
-
     let query = {
       user_id: data.user_id,
       chat_id: data.chat_id,
