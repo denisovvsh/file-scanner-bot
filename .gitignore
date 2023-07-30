@@ -1,0 +1,8 @@
+node_modules/
+.cache/
+img/*
+.env
+package-lock.json
+*.log
+*.deb
+*.png
