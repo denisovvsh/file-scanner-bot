@@ -153,22 +153,42 @@ class FilescannerAssistant extends attributesAssistant {
     .on('add', async (path) => {
       let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
       await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+      .catch((err) => {
+        this._logCrmAssistant.level = "error"
+        this._logCrmAssistant.error(err)
+      })
     })
     .on('change', async (path) => {
       let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
       await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+      .catch((err) => {
+        this._logCrmAssistant.level = "error"
+        this._logCrmAssistant.error(err)
+      })
     })
     .on('unlink', async (path) => {
       let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
       await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+      .catch((err) => {
+        this._logCrmAssistant.level = "error"
+        this._logCrmAssistant.error(err)
+      })
     })
     .on('addDir', async (path) => {
       let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
       await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+      .catch((err) => {
+        this._logCrmAssistant.level = "error"
+        this._logCrmAssistant.error(err)
+      })
     })
     .on('unlinkDir', async (path) => {
       let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
       await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+      .catch((err) => {
+        this._logCrmAssistant.level = "error"
+        this._logCrmAssistant.error(err)
+      })
     })
   }
 
