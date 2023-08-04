@@ -164,13 +164,17 @@ try {
   logger.level = "info"
   logger.info("Restart BOT")
 } finally {
-  let filescanner = new FilescannerAssistant(bot, md5)
-  filescanner.commandRun()
-
-  bot.telegram.sendMessage(
-    process.env.BOT_ADMINISTRATOR_ID,
-    `🟠 Запущен бот ${process.env.BOT_LINK_USERNAME}`, {"parse_mode": "HTML"}
-  )
+  try {
+    let filescanner = new FilescannerAssistant(bot, md5)
+    filescanner.commandRun()
+    bot.telegram.sendMessage(
+      process.env.BOT_ADMINISTRATOR_ID,
+      `🟠 Запущен бот ${process.env.BOT_LINK_USERNAME}`, {"parse_mode": "HTML"}
+    )
+  } catch (err) {
+    logger.level = "error"
+    logger.info(err)
+  }
 }
 
 //let cronFn = new cronAssistant(bot, md5)
