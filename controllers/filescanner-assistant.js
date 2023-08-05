@@ -196,28 +196,64 @@ class FilescannerAssistant extends attributesAssistant {
         persistent: true // Оставаться в слежении даже после завершения сценария
       })
       .on('add', async (path) => {
-        let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
-        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        try {
+          let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
+          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        } catch (err) {
+          console.log(err)
+          this._loglog4jsFilescannerAssistant.level = "error"
+          this._loglog4jsFilescannerAssistant.error(err)
+        }
       })
       .on('change', async (path) => {
-        let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
-        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        try {
+          let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
+          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        } catch (err) {
+          console.log(err)
+          this._loglog4jsFilescannerAssistant.level = "error"
+          this._loglog4jsFilescannerAssistant.error(err)
+        }
       })
       .on('unlink', async (path) => {
-        let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
-        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        try {
+          let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
+          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        } catch (err) {
+          console.log(err)
+          this._loglog4jsFilescannerAssistant.level = "error"
+          this._loglog4jsFilescannerAssistant.error(err)
+        }
       })
       .on('addDir', async (path) => {
-        let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
-        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        try {
+          let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
+          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        } catch (err) {
+          console.log(err)
+          this._loglog4jsFilescannerAssistant.level = "error"
+          this._loglog4jsFilescannerAssistant.error(err)
+        }
       })
       .on('unlinkDir', async (path) => {
-        let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
-        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        try {
+          let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
+          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+        } catch (err) {
+          console.log(err)
+          this._loglog4jsFilescannerAssistant.level = "error"
+          this._loglog4jsFilescannerAssistant.error(err)
+        }
       })
       .on('error', async (error) => {
-        let text = `Произошла ошибка при мониторинге: \n\n<pre>${error}</pre>`
-        await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
+        try {
+          let text = `Произошла ошибка при мониторинге: \n\n<pre>${error}</pre>`
+          await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
+        } catch (err) {
+          console.log(err)
+          this._loglog4jsFilescannerAssistant.level = "error"
+          this._loglog4jsFilescannerAssistant.error(err)
+        }
       })
     } catch (err) {
       this._loglog4jsFilescannerAssistant.level = "error"
