@@ -37,165 +37,201 @@ class FilescannerAssistant extends attributesAssistant {
   }
 
   async upDir(directoryPath) {
-    let arrPath = directoryPath.split('/')
-    arrPath.pop()
-    return arrPath.join('/')
+    try {
+      let arrPath = directoryPath.split('/')
+      arrPath.pop()
+      return arrPath.join('/')
+    } catch (err) {
+      let text = `🆘 <pre>${err}</pre>`
+      await this._bot.telegram.sendMessage(process.env.BOT_ADMINISTRATOR_ID, text, {"parse_mode": "HTML"})
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
+    }
   }
 
   async accessDri(directoryPath = '/home', data = null) {
-    fs.access(directoryPath, fs.constants.F_OK, async (err) => {
-      if (err) {
-        let text = `🔴 <i>Нет доступа к директории:</i> <pre>${err}</pre>`
-        await this._bot.telegram.sendMessage(data.user_id, text, {"parse_mode": "HTML"})
-
-        directoryPath = await this.upDir(directoryPath)
-        if (directoryPath) {
-          text = `🟠 <i>Проверяем директорию:</i> <pre>${directoryPath}</pre>`
+    try {
+      fs.access(directoryPath, fs.constants.F_OK, async (err) => {
+        if (err) {
+          let text = `🔴 <i>Нет доступа к директории:</i> <pre>${err}</pre>`
           await this._bot.telegram.sendMessage(data.user_id, text, {"parse_mode": "HTML"})
-          this.accessDri(directoryPath, data)
+
+          directoryPath = await this.upDir(directoryPath)
+          if (directoryPath) {
+            text = `🟠 <i>Проверяем директорию:</i> <pre>${directoryPath}</pre>`
+            await this._bot.telegram.sendMessage(data.user_id, text, {"parse_mode": "HTML"})
+            this.accessDri(directoryPath, data)
+          }
+          return false
+        } else {
+          this.insertPathDirAndStartMonitoring(directoryPath, data)
         }
-        return false
-      } else {
-        this.insertPathDirAndStartMonitoring(directoryPath, data)
-      }
-    })
+      })
+    } catch (err) {
+      let text = `🆘 <pre>${err}</pre>`
+      await this._bot.telegram.sendMessage(process.env.BOT_ADMINISTRATOR_ID, text, {"parse_mode": "HTML"})
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
+    }
   }
 
   async insertPathDirAndStartMonitoring(directoryPath, data) {
-    let query = {
-      user_id: data.user_id,
-      chat_id: data.chat_id,
-      path: directoryPath,
-    }
-    let update = {
-      $set: {
-        user_id: data.user_id || null,
-        chat_id: data.chat_id || null,
-        chat_title: data.chat_title || null,
+    try {
+      let query = {
+        user_id: data.user_id,
+        chat_id: data.chat_id,
         path: directoryPath,
       }
-    }
-    let options = {
-      upsert: true
-    }
+      let update = {
+        $set: {
+          user_id: data.user_id || null,
+          chat_id: data.chat_id || null,
+          chat_title: data.chat_title || null,
+          path: directoryPath,
+        }
+      }
+      let options = {
+        upsert: true
+      }
 
-    let res = await this._db.queryUpdate(this._db._collectionsList.directory_list, query, update, options)
+      let res = await this._db.queryUpdate(this._db._collectionsList.directory_list, query, update, options)
 
-    if (res.acknowledged) {
-      if (res.upsertedId) await this.startMonitoringDir(directoryPath, data)
-    } else {
-      this._bot.telegram.sendMessage(
-        data.user_id, 
-        `<i>🔴 Ошибка запуска мониторинга директории: <pre>${directoryPath}</pre></i>`, 
-        {"parse_mode": "HTML"}
-      )
+      if (res.acknowledged) {
+        if (res.upsertedId) await this.startMonitoringDir(directoryPath, data)
+      } else {
+        this._bot.telegram.sendMessage(
+          data.user_id, 
+          `<i>🔴 Ошибка запуска мониторинга директории: <pre>${directoryPath}</pre></i>`, 
+          {"parse_mode": "HTML"}
+        )
+      }
+    } catch (err) {
+      let text = `🆘 <pre>${err}</pre>`
+      await this._bot.telegram.sendMessage(process.env.BOT_ADMINISTRATOR_ID, text, {"parse_mode": "HTML"})
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
     }
   }
 
   async removeDirFrom(directoryPath, userId) {
-    let query = {
-      user_id: userId,
-      path: directoryPath,
-    }
+    try {
+      let query = {
+        user_id: userId,
+        path: directoryPath,
+      }
 
-    return this._db.queryDeleteMany(this._db._collectionsList.directory_list, query)
+      return this._db.queryDeleteMany(this._db._collectionsList.directory_list, query)
+    } catch (err) {
+      let text = `🆘 <pre>${err}</pre>`
+      await this._bot.telegram.sendMessage(process.env.BOT_ADMINISTRATOR_ID, text, {"parse_mode": "HTML"})
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
+    }
   }
 
   async readDri(directoryPath = '/home', userId = null) {
-    fs.readdir(`${directoryPath}`, async (err, files) => {
-      if (err) {
-        let text = `🔴 <i>Ошибка при чтении директории:</i> \n<pre>${err}</pre>`
-        await this._bot.telegram.sendMessage(userId, text, {"parse_mode": "HTML"})
-
-        /* directoryPath = await this.upDir(directoryPath)
-        if (directoryPath) {
-          text = `🟠 Проверяем директорию: <pre>${directoryPath}</pre>`
+    try {
+      fs.readdir(`${directoryPath}`, async (err, files) => {
+        if (err) {
+          let text = `🔴 <i>Ошибка при чтении директории:</i> \n<pre>${err}</pre>`
           await this._bot.telegram.sendMessage(userId, text, {"parse_mode": "HTML"})
-          
-          this.readDri(directoryPath, userId)
-        } */
-        return false
-      }
 
-      this.commandRun(directoryPath)
+          /* directoryPath = await this.upDir(directoryPath)
+          if (directoryPath) {
+            text = `🟠 Проверяем директорию: <pre>${directoryPath}</pre>`
+            await this._bot.telegram.sendMessage(userId, text, {"parse_mode": "HTML"})
+            
+            this.readDri(directoryPath, userId)
+          } */
+          return false
+        }
 
-      // Фильтруем только директории
-      /* let directories = files.filter((file) => {
-        return fs.statSync(`${directoryPath}/${file}`).isDirectory();
-      }) */
-    
-      // Выводим список директорий
-      /* let text = `🟢 Список директорий внутри <pre>${directoryPath}</pre>:`
-      await this._bot.telegram.sendMessage(userId, text + directories.join('\n'), {"parse_mode": "HTML"})
+        this.commandRun(directoryPath)
+
+        // Фильтруем только директории
+        /* let directories = files.filter((file) => {
+          return fs.statSync(`${directoryPath}/${file}`).isDirectory();
+        }) */
       
-      console.log(directories) */
-    })
+        // Выводим список директорий
+        /* let text = `🟢 Список директорий внутри <pre>${directoryPath}</pre>:`
+        await this._bot.telegram.sendMessage(userId, text + directories.join('\n'), {"parse_mode": "HTML"})
+        
+        console.log(directories) */
+      })
+    } catch (err) {
+      let text = `🆘 <pre>${err}</pre>`
+      await this._bot.telegram.sendMessage(process.env.BOT_ADMINISTRATOR_ID, text, {"parse_mode": "HTML"})
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
+    }
   }
 
   async commandRun(directoryPath) {
-    let query = {}
-    let select = {}
-    let result = await this._db.queryFind(this._db._collectionsList.directory_list, query, select, {}, 999)
-    if (!result) return
-    for (let data of result.response) {
-      if (directoryPath && directoryPath !== data.path) continue
-      await this.delay(500)
-      this.startMonitoringDir(data.path, data)
+    try {
+      let query = {}
+      let select = {}
+      let result = await this._db.queryFind(this._db._collectionsList.directory_list, query, select, {}, 999)
+      if (!result) return
+      for (let data of result.response) {
+        if (directoryPath && directoryPath !== data.path) continue
+        await this.delay(1000)
+        await this.startMonitoringDir(data.path, data)
+      }
+      let text = `🟢 Стартовое сканирование завершено!`
+      await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
+    } catch (err) {
+      let text = `🆘 <pre>${err}</pre>`
+      await this._bot.telegram.sendMessage(process.env.BOT_ADMINISTRATOR_ID, text, {"parse_mode": "HTML"})
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
     }
   }
 
   async startMonitoringDir(directoryPath, data = null) {
-    let key = this._md5(directoryPath)
-    watcher[key] = chokidar.watch(directoryPath, {
-      ignored: /(^|[\/\\])\../, // Игнорировать скрытые файлы
-      persistent: true // Оставаться в слежении даже после завершения сценария
-    })
-    .on('add', async (path) => {
-      let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
-      await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
-      .catch((err) => {
-        this._logCrmAssistant.level = "error"
-        this._logCrmAssistant.error(err)
+    try {
+      let key = this._md5(directoryPath)
+      watcher[key] = chokidar.watch(directoryPath, {
+        ignored: /(^|[\/\\])\../, // Игнорировать скрытые файлы
+        persistent: true // Оставаться в слежении даже после завершения сценария
       })
-    })
-    .on('change', async (path) => {
-      let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
-      await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
-      .catch((err) => {
-        this._logCrmAssistant.level = "error"
-        this._logCrmAssistant.error(err)
+      .on('add', async (path) => {
+        let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
+        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
       })
-    })
-    .on('unlink', async (path) => {
-      let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
-      await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
-      .catch((err) => {
-        this._logCrmAssistant.level = "error"
-        this._logCrmAssistant.error(err)
+      .on('change', async (path) => {
+        let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
+        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
       })
-    })
-    .on('addDir', async (path) => {
-      let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
-      await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
-      .catch((err) => {
-        this._logCrmAssistant.level = "error"
-        this._logCrmAssistant.error(err)
+      .on('unlink', async (path) => {
+        let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
+        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
       })
-    })
-    .on('unlinkDir', async (path) => {
-      let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
-      await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
-      .catch((err) => {
-        this._logCrmAssistant.level = "error"
-        this._logCrmAssistant.error(err)
+      .on('addDir', async (path) => {
+        let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
+        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
       })
-    })
+      .on('unlinkDir', async (path) => {
+        let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
+        await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+      })
+    } catch (err) {
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
+    }
   }
 
   async stopMonitoring(path) {
-    let key = this._md5(path)
-    if (watcher[key]) {
-      await watcher[key].close()
+    try {
+      let key = this._md5(path)
+      if (watcher[key]) {
+        await watcher[key].close()
+      }
+    } catch (err) {
+      let text = `🆘 <pre>${err}</pre>`
+      await this._bot.telegram.sendMessage(process.env.BOT_ADMINISTRATOR_ID, text, {"parse_mode": "HTML"})
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
     }
   }
 
@@ -357,8 +393,8 @@ class FilescannerAssistant extends attributesAssistant {
     } catch (err) {
       let text = `🆘 <pre>${err}</pre>`
       await this._bot.telegram.sendMessage(process.env.BOT_ADMINISTRATOR_ID, text, {"parse_mode": "HTML"})
-      this._logCrmAssistant.level = "error"
-      this._logCrmAssistant.error(err)
+      this._loglog4jsFilescannerAssistant.level = "error"
+      this._loglog4jsFilescannerAssistant.error(err)
     }
   }
 
