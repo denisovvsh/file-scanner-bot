@@ -190,40 +190,70 @@ class FilescannerAssistant extends attributesAssistant {
 
   async startMonitoringDir(directoryPath, data = null) {
     try {
-      fs.readdir(`${directoryPath}`, async (err, files) => {
-        if (err) {
-          let text = `🔴 <i>Ошибка при чтении директории:</i> \n<pre>${err}</pre>`
-          await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
-          return false
-        }
+      
 
         let key = this._md5(directoryPath)
 
-        /* watcher[key] = chokidar.watch(directoryPath, {
+        watcher[key] = chokidar.watch(directoryPath, {
           ignored: /(^|[\/\\])\../, // Игнорировать скрытые файлы
           persistent: true // Оставаться в слежении даже после завершения сценария
         })
         .on('add', async (path) => {
-          let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
-          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          fs.readdir(`${path}`, async (err, files) => {
+            if (err) {
+              let text = `🔴 <i>Ошибка при чтении директории:</i> \n<pre>${err}</pre>`
+              await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
+              return false
+            }
+            let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
+            await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          })
         })
         .on('change', async (path) => {
-          let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
-          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          fs.readdir(`${path}`, async (err, files) => {
+            if (err) {
+              let text = `🔴 <i>Ошибка при чтении директории:</i> \n<pre>${err}</pre>`
+              await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
+              return false
+            }
+            let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
+            await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          })
         })
         .on('unlink', async (path) => {
-          let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
-          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          fs.readdir(`${path}`, async (err, files) => {
+            if (err) {
+              let text = `🔴 <i>Ошибка при чтении директории:</i> \n<pre>${err}</pre>`
+              await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
+              return false
+            }
+            let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
+            await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          })
         })
         .on('addDir', async (path) => {
-          let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
-          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          fs.readdir(`${path}`, async (err, files) => {
+            if (err) {
+              let text = `🔴 <i>Ошибка при чтении директории:</i> \n<pre>${err}</pre>`
+              await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
+              return false
+            }
+            let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
+            await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          })
         })
         .on('unlinkDir', async (path) => {
-          let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
-          await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
-        }) */
-      })
+          fs.readdir(`${path}`, async (err, files) => {
+            if (err) {
+              let text = `🔴 <i>Ошибка при чтении директории:</i> \n<pre>${err}</pre>`
+              await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
+              return false
+            }
+            let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
+            await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
+          })
+        })
+
     } catch (err) {
       this._loglog4jsFilescannerAssistant.level = "error"
       this._loglog4jsFilescannerAssistant.error(err)
