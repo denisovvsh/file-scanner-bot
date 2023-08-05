@@ -216,7 +216,7 @@ class FilescannerAssistant extends attributesAssistant {
         await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
       })
       .on('error', async (error) => {
-        let text = `Произошла ошибка при мониторинге: \n\n<pre>${path}</pre>\n<pre>${error}</pre>`
+        let text = `Произошла ошибка при мониторинге: \n\n<pre>${error}</pre>`
         await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
       })
     } catch (err) {
