@@ -7,6 +7,7 @@ const fs = require('fs')
 const chokidar = require('chokidar')
 const log4jsFilescannerAssistant = require("log4js")
 const watcher = []
+const scannedDirectories = new Set()
 
 class FilescannerAssistant extends attributesAssistant {
   constructor(bot, md5, ...args) {
@@ -195,62 +196,81 @@ class FilescannerAssistant extends attributesAssistant {
         ignored: /(^|[\/\\])\../, // Игнорировать скрытые файлы
         persistent: true // Оставаться в слежении даже после завершения сценария
       })
+      .on('ready', () => {
+        console.log(`Мониторинг директории ${directoryToWatch} начат.`)
+        const initialDirectories = Array.from(scannedDirectories)
+        console.log('Список директорий при старте программы:', initialDirectories)
+      })
       .on('add', async (path) => {
-        try {
+        if (!scannedDirectories.has(path)) {
+          scannedDirectories.add(path);
+          console.log(`Добавлена новая директория: ${path}`);
+        }
+        /* try {
           let text = `➕ 📥 <b>Новый файл:</b> \n\n<pre>${path}</pre>`
           await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
         } catch (err) {
-          console.log(err)
           this._loglog4jsFilescannerAssistant.level = "error"
           this._loglog4jsFilescannerAssistant.error(err)
-        }
+        } */
       })
       .on('change', async (path) => {
-        try {
+        if (!scannedDirectories.has(path)) {
+          scannedDirectories.add(path);
+          console.log(`Добавлена новая директория: ${path}`);
+        }
+        /* try {
           let text = `📝 <b>Файл изменен:</b> \n\n<pre>${path}</pre>`
           await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
         } catch (err) {
-          console.log(err)
           this._loglog4jsFilescannerAssistant.level = "error"
           this._loglog4jsFilescannerAssistant.error(err)
-        }
+        } */
       })
       .on('unlink', async (path) => {
-        try {
+        if (!scannedDirectories.has(path)) {
+          scannedDirectories.add(path);
+          console.log(`Добавлена новая директория: ${path}`);
+        }
+        /* try {
           let text = `➖ 📤 <b>Файл удален:</b> \n\n<pre>${path}</pre>`
           await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
         } catch (err) {
-          console.log(err)
           this._loglog4jsFilescannerAssistant.level = "error"
           this._loglog4jsFilescannerAssistant.error(err)
-        }
+        } */
       })
       .on('addDir', async (path) => {
-        try {
+        if (!scannedDirectories.has(path)) {
+          scannedDirectories.add(path);
+          console.log(`Добавлена новая директория: ${path}`);
+        }
+        /* try {
           let text = `➕ 📂 <b>Новая директория:</b> \n\n<pre>${path}</pre>`
           await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
         } catch (err) {
-          console.log(err)
           this._loglog4jsFilescannerAssistant.level = "error"
           this._loglog4jsFilescannerAssistant.error(err)
-        }
+        } */
       })
       .on('unlinkDir', async (path) => {
-        try {
+        if (!scannedDirectories.has(path)) {
+          scannedDirectories.add(path);
+          console.log(`Добавлена новая директория: ${path}`);
+        }
+        /* try {
           let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
           await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
         } catch (err) {
-          console.log(err)
           this._loglog4jsFilescannerAssistant.level = "error"
           this._loglog4jsFilescannerAssistant.error(err)
-        }
+        } */
       })
       .on('error', async (error) => {
         try {
-          let text = `Произошла ошибка при мониторинге: \n\n<pre>${error}</pre>`
+          let text = `🔴 Произошла ошибка при мониторинге: \n\n<pre>${error}</pre>`
           await this._bot.telegram.sendMessage(process.env.OWNER_CHAT_ID, text, {"parse_mode": "HTML"})
         } catch (err) {
-          console.log(err)
           this._loglog4jsFilescannerAssistant.level = "error"
           this._loglog4jsFilescannerAssistant.error(err)
         }
