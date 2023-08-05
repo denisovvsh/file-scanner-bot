@@ -194,7 +194,11 @@ class FilescannerAssistant extends attributesAssistant {
       let key = this._md5(directoryPath)
       watcher[key] = chokidar.watch(directoryPath, {
         ignored: /(^|[\/\\])\../, // Игнорировать скрытые файлы
-        persistent: true // Оставаться в слежении даже после завершения сценария
+        persistent: true, // Оставаться в слежении даже после завершения сценария
+        awaitWriteFinish: {
+          stabilityThreshold: 2000, // Задержка после записи файла в миллисекундах
+          pollInterval: 100 // Интервал опроса для проверки записи в миллисекундах
+        }
       })
       .on('ready', (path) => {
         console.log(`Мониторинг директории ${path} начат.`)
