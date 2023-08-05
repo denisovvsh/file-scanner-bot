@@ -196,8 +196,8 @@ class FilescannerAssistant extends attributesAssistant {
         ignored: /(^|[\/\\])\../, // Игнорировать скрытые файлы
         persistent: true // Оставаться в слежении даже после завершения сценария
       })
-      .on('ready', () => {
-        console.log(`Мониторинг директории ${directoryToWatch} начат.`)
+      .on('ready', (path) => {
+        console.log(`Мониторинг директории ${path} начат.`)
         const initialDirectories = Array.from(scannedDirectories)
         console.log('Список директорий при старте программы:', initialDirectories)
       })
