@@ -199,7 +199,7 @@ class FilescannerAssistant extends attributesAssistant {
 
         let key = this._md5(directoryPath)
 
-        watcher[key] = chokidar.watch(directoryPath, {
+        /* watcher[key] = chokidar.watch(directoryPath, {
           ignored: /(^|[\/\\])\../, // Игнорировать скрытые файлы
           persistent: true // Оставаться в слежении даже после завершения сценария
         })
@@ -222,7 +222,7 @@ class FilescannerAssistant extends attributesAssistant {
         .on('unlinkDir', async (path) => {
           let text = `➖ 📁 <b>Директория удалена:</b> \n\n<pre>${path}</pre>`
           await this._bot.telegram.sendMessage(data.chat_id, text, {"parse_mode": "HTML"})
-        })
+        }) */
       })
     } catch (err) {
       this._loglog4jsFilescannerAssistant.level = "error"
